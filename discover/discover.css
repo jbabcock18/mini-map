@@ -1,0 +1,234 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #ecf3ff;
+  --panel: #fdfefe;
+  --border: rgba(148, 176, 220, 0.52);
+  --text-main: #162640;
+  --text-muted: #5c708f;
+  --accent: #3f82ff;
+  --shadow: 0 18px 34px rgba(40, 71, 118, 0.12);
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(145, 196, 255, 0.2), transparent 30%),
+    radial-gradient(circle at 100% 0%, rgba(131, 230, 211, 0.2), transparent 28%),
+    var(--bg);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.discover-header {
+  max-width: 74rem;
+  margin: 0 auto;
+  padding: 1.2rem 1rem 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  color: #4a7ec7;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.discover-header h1 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+}
+
+.discover-nav {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.discover-nav a {
+  text-decoration: none;
+  border: 1px solid var(--border);
+  color: #2c4975;
+  background: rgba(250, 253, 255, 0.95);
+  padding: 0.44rem 0.7rem;
+  border-radius: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.discover-nav a.is-active {
+  color: #fff;
+  border-color: rgba(63, 130, 255, 0.7);
+  background: linear-gradient(120deg, #6ca6ff, #3f82ff);
+}
+
+.discover-main {
+  max-width: 74rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.discover-section {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hero-card {
+  border: 1px solid rgba(145, 176, 220, 0.5);
+  border-radius: 0.9rem;
+  background: linear-gradient(140deg, rgba(250, 254, 255, 0.95), rgba(235, 246, 255, 0.92));
+  padding: 0.95rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.section-kicker {
+  margin: 0;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4c6790;
+}
+
+.hero-card h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 1.04rem;
+}
+
+.meta-line {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.random-preview {
+  border-top: 1px solid rgba(156, 182, 221, 0.5);
+  margin-top: 0.2rem;
+  padding-top: 0.5rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+}
+
+.section-head p {
+  margin: 0.2rem 0 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.runs-list {
+  margin-top: 0.7rem;
+  display: grid;
+  gap: 0.56rem;
+}
+
+.run-card {
+  border: 1px solid rgba(160, 187, 225, 0.58);
+  border-radius: 0.86rem;
+  background: #fff;
+  padding: 0.72rem;
+  display: grid;
+  gap: 0.38rem;
+}
+
+.run-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.run-top h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.run-vibe {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.run-stats {
+  margin: 0;
+  color: #37557f;
+  font-size: 0.74rem;
+}
+
+.run-actions {
+  margin-top: 0.12rem;
+  display: flex;
+  gap: 0.38rem;
+  flex-wrap: wrap;
+}
+
+.solid-btn,
+.ghost-btn {
+  border-radius: 0.62rem;
+  border: none;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.solid-btn {
+  color: #fff;
+  background: linear-gradient(120deg, #6ca6ff, #3f82ff);
+  padding: 0.43rem 0.7rem;
+}
+
+.ghost-btn {
+  color: #31517e;
+  border: 1px solid rgba(152, 179, 220, 0.64);
+  background: rgba(248, 252, 255, 0.95);
+  padding: 0.4rem 0.66rem;
+  font-weight: 600;
+}
+
+.empty-line {
+  margin: 0;
+  color: #6a7f9f;
+  font-size: 0.76rem;
+}
+
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .discover-header {
+    flex-direction: column;
+  }
+}

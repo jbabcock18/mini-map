@@ -1,0 +1,64 @@
+{
+  "v": 1,
+  "runs": [
+    {
+      "id": "golden-hour-loop",
+      "title": "Golden Hour Loop",
+      "vibe": "Golden Hour",
+      "placeIds": ["houndstooth", "uchi", "roosevelt-room"],
+      "tags": ["rotd", "random", "community"],
+      "isFeatured": true
+    },
+    {
+      "id": "lady-bird-trail-run",
+      "title": "Lady Bird Trail Run",
+      "vibe": "Slow Morning",
+      "placeIds": ["joes", "fleet", "launderette", "roosevelt-room"],
+      "tags": ["rotd", "random", "community"],
+      "isFeatured": true
+    },
+    {
+      "id": "bar-crawl-challenge",
+      "title": "Bar Crawl Challenge",
+      "vibe": "Bar Crawl",
+      "placeIds": ["roosevelt-room", "small-victory", "whislers", "nickel-city"],
+      "tags": ["random", "community"]
+    },
+    {
+      "id": "jacks-birthday-pub-crawl",
+      "title": "Jack's Birthday Pub Crawl",
+      "vibe": "Birthday Energy",
+      "placeIds": ["deep-eddy", "roosevelt-room", "whislers", "nickel-city"],
+      "tags": ["community", "random"]
+    },
+    {
+      "id": "coffee-loop-eastside",
+      "title": "Eastside Coffee Loop",
+      "vibe": "Slow Morning",
+      "placeIds": ["fleet", "joes", "houndstooth", "civil-goat"],
+      "tags": ["random", "community"]
+    },
+    {
+      "id": "downtown-date-night",
+      "title": "Downtown Date Night",
+      "vibe": "Date Night",
+      "placeIds": ["merit", "intero", "small-victory"],
+      "tags": ["rotd", "random", "community"],
+      "isFeatured": true
+    },
+    {
+      "id": "food-tour-classic",
+      "title": "Food Tour Classic",
+      "vibe": "Golden Hour",
+      "placeIds": ["canje", "launderette", "odd-duck", "roosevelt-room"],
+      "tags": ["random", "community"]
+    },
+    {
+      "id": "austin-westside-walk",
+      "title": "Westside Walk",
+      "vibe": "Slow Morning",
+      "placeIds": ["civil-goat", "merit", "uchi"],
+      "tags": ["random", "rotd"]
+    }
+  ]
+}
