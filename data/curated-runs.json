@@ -2,63 +2,73 @@
   "v": 1,
   "runs": [
     {
-      "id": "golden-hour-loop",
-      "title": "Golden Hour Loop",
-      "vibe": "Golden Hour",
-      "placeIds": ["houndstooth", "uchi", "roosevelt-room"],
+      "id": "downtown-fitness-circuit",
+      "title": "Downtown Fitness Circuit",
+      "vibe": "Mixed Session",
+      "placeIds": [
+        "republic-square-bars",
+        "butler-track",
+        "lady-bird-trail-auditorium",
+        "barton-hills-stairs"
+      ],
       "tags": ["rotd", "random", "community"],
       "isFeatured": true
     },
     {
-      "id": "lady-bird-trail-run",
-      "title": "Lady Bird Trail Run",
-      "vibe": "Slow Morning",
-      "placeIds": ["joes", "fleet", "launderette", "roosevelt-room"],
+      "id": "eastside-strength-loop",
+      "title": "Eastside Strength Loop",
+      "vibe": "Strength",
+      "placeIds": [
+        "eastside-track",
+        "ut-stadium-steps",
+        "pease-fitness-court"
+      ],
+      "tags": ["random", "community"]
+    },
+    {
+      "id": "trail-endurance-day",
+      "title": "Trail Endurance Day",
+      "vibe": "Endurance",
+      "placeIds": [
+        "shoal-creek-trail",
+        "lady-bird-trail-auditorium",
+        "walnut-creek-trail"
+      ],
       "tags": ["rotd", "random", "community"],
       "isFeatured": true
     },
     {
-      "id": "bar-crawl-challenge",
-      "title": "Bar Crawl Challenge",
-      "vibe": "Bar Crawl",
-      "placeIds": ["roosevelt-room", "small-victory", "whislers", "nickel-city"],
+      "id": "hill-repeat-challenge",
+      "title": "Hill Repeat Challenge",
+      "vibe": "Hill Session",
+      "placeIds": [
+        "south-lamar-hill",
+        "mt-bonnell-climb",
+        "river-place-climb"
+      ],
       "tags": ["random", "community"]
     },
     {
-      "id": "jacks-birthday-pub-crawl",
-      "title": "Jack's Birthday Pub Crawl",
-      "vibe": "Birthday Energy",
-      "placeIds": ["deep-eddy", "roosevelt-room", "whislers", "nickel-city"],
-      "tags": ["community", "random"]
-    },
-    {
-      "id": "coffee-loop-eastside",
-      "title": "Eastside Coffee Loop",
-      "vibe": "Slow Morning",
-      "placeIds": ["fleet", "joes", "houndstooth", "civil-goat"],
-      "tags": ["random", "community"]
-    },
-    {
-      "id": "downtown-date-night",
-      "title": "Downtown Date Night",
-      "vibe": "Date Night",
-      "placeIds": ["merit", "intero", "small-victory"],
-      "tags": ["rotd", "random", "community"],
-      "isFeatured": true
-    },
-    {
-      "id": "food-tour-classic",
-      "title": "Food Tour Classic",
-      "vibe": "Golden Hour",
-      "placeIds": ["canje", "launderette", "odd-duck", "roosevelt-room"],
-      "tags": ["random", "community"]
-    },
-    {
-      "id": "austin-westside-walk",
-      "title": "Westside Walk",
-      "vibe": "Slow Morning",
-      "placeIds": ["civil-goat", "merit", "uchi"],
+      "id": "pullup-and-pace",
+      "title": "Pull-Up + Pace",
+      "vibe": "Speed Work",
+      "placeIds": [
+        "zilker-calisthenics",
+        "butler-track",
+        "austin-high-track"
+      ],
       "tags": ["random", "rotd"]
+    },
+    {
+      "id": "recovery-mobility-route",
+      "title": "Recovery Mobility Route",
+      "vibe": "Recovery",
+      "placeIds": [
+        "lady-bird-trail-auditorium",
+        "shoal-creek-trail",
+        "pease-fitness-court"
+      ],
+      "tags": ["random", "community"]
     }
   ]
 }

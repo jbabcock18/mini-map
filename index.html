@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mini Map</title>
+    <title>Fitness Finder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -29,8 +29,8 @@
             <section class="panel-card plan-header" id="plan-header">
               <div class="plan-header-top">
                 <div>
-                  <p class="eyebrow">Mini Map</p>
-                  <h1 id="plan-title-display">My Plan</h1>
+                  <p class="eyebrow">Fitness Finder</p>
+                  <h1 id="plan-title-display">My Route</h1>
                   <input id="plan-title-input" class="field-input hidden" type="text" maxlength="80" />
                 </div>
                 <div class="header-ctas">
@@ -40,14 +40,15 @@
                 </div>
               </div>
               <div class="vibe-row">
-                <span class="meta-label">Vibe</span>
-                <span id="vibe-display" class="vibe-pill">Golden Hour</span>
+                <span class="meta-label">Focus</span>
+                <span id="vibe-display" class="vibe-pill">Mixed Session</span>
                 <select id="vibe-input" class="field-select hidden">
-                  <option>Golden Hour</option>
-                  <option>Slow Morning</option>
-                  <option>Date Night</option>
-                  <option>Bar Crawl</option>
-                  <option>Birthday Energy</option>
+                  <option>Mixed Session</option>
+                  <option>Endurance</option>
+                  <option>Strength</option>
+                  <option>Speed Work</option>
+                  <option>Hill Session</option>
+                  <option>Recovery</option>
                 </select>
               </div>
               <div class="stats-inline">
@@ -57,23 +58,41 @@
                 </span>
                 <span class="stat-inline-item">
                   <strong id="stat-walking">0m</strong>
-                  <small>Walk</small>
+                  <small>Move</small>
                 </span>
                 <span class="stat-inline-item">
                   <strong id="stat-stops">0</strong>
-                  <small>Stops</small>
+                  <small>Locations</small>
                 </span>
               </div>
+            </section>
+
+            <section class="panel-card finder-panel">
+              <div class="section-heading-row">
+                <div>
+                  <h2>Find Locations</h2>
+                  <p>Filter by location type.</p>
+                </div>
+              </div>
+              <div id="catalog-category-filters" class="category-filter-row" role="group" aria-label="Location category filters">
+                <button class="filter-chip is-active" type="button" data-category="all">All</button>
+                <button class="filter-chip" type="button" data-category="calisthenics">Calisthenics</button>
+                <button class="filter-chip" type="button" data-category="track">Tracks</button>
+                <button class="filter-chip" type="button" data-category="trail">Trails</button>
+                <button class="filter-chip" type="button" data-category="hill">Hills</button>
+                <button class="filter-chip" type="button" data-category="stairs">Stairs</button>
+              </div>
+              <p class="finder-hint">Tip: click any marker to inspect it. In edit mode, map clicks add locations to your route.</p>
             </section>
 
             <section class="panel-card timeline-panel">
               <div class="section-heading-row">
                 <div>
-                  <h2>Timeline</h2>
-                  <p>Stops and route distance</p>
+                  <h2>Route</h2>
+                  <p>Locations and route distance</p>
                 </div>
                 <div class="section-actions">
-                  <button id="add-stop-inline-btn" class="ghost-btn subtle" type="button">+ Add a stop</button>
+                  <button id="add-stop-inline-btn" class="ghost-btn subtle" type="button">+ Add location</button>
                   <button id="optimize-order-btn" class="ghost-btn subtle hidden" type="button">
                     Optimize Order
                   </button>
@@ -89,12 +108,12 @@
           <div class="left-panel-scroll">
             <section class="panel-card discover-hero-panel">
               <p class="eyebrow">Discover</p>
-              <h2 class="discover-panel-title">Run of the Day</h2>
-              <h3 id="run-of-day-title-sidebar" class="discover-run-title">Loading daily run...</h3>
+              <h2 class="discover-panel-title">Route of the Day</h2>
+              <h3 id="run-of-day-title-sidebar" class="discover-run-title">Loading daily route...</h3>
               <p id="run-of-day-meta-sidebar" class="stop-meta"></p>
               <div class="discover-actions">
                 <button id="preview-run-of-day-sidebar" class="ghost-btn" type="button">Preview</button>
-                <button id="use-run-of-day-sidebar" class="solid-btn" type="button">Use this plan</button>
+                <button id="use-run-of-day-sidebar" class="solid-btn" type="button">Use this route</button>
                 <button id="save-run-of-day-sidebar" class="ghost-btn" type="button">Save</button>
               </div>
             </section>
@@ -102,7 +121,7 @@
             <section class="panel-card">
               <div class="section-heading-row">
                 <div>
-                  <h2>Random Run</h2>
+                  <h2>Random Route</h2>
                   <p>One-click inspiration</p>
                 </div>
                 <button id="random-run-sidebar-btn" class="ghost-btn subtle" type="button">Roll</button>
@@ -113,8 +132,8 @@
             <section class="panel-card">
               <div class="section-heading-row">
                 <div>
-                  <h2>Saved Runs</h2>
-                  <p>Plans you saved, from yourself or the community</p>
+                  <h2>Saved Routes</h2>
+                  <p>Routes you saved, from yourself or the community</p>
                 </div>
               </div>
               <div id="saved-runs-sidebar-list" class="discover-runs-list"></div>
@@ -123,7 +142,7 @@
             <section class="panel-card">
               <div class="section-heading-row">
                 <div>
-                  <h2>Community Runs</h2>
+                  <h2>Community Routes</h2>
                   <p>Featured then recent</p>
                 </div>
               </div>
@@ -138,9 +157,9 @@
         <button id="sidebar-toggle" class="ghost-btn sidebar-toggle" type="button">Hide Sidebar</button>
 
         <div id="map-quest-card" class="quest-card">
-          <h2>Stops</h2>
+          <h2>Route Locations</h2>
           <ol id="map-quest-list" class="quest-list"></ol>
-          <p id="map-quest-empty" class="quest-empty">No stops in this plan yet.</p>
+          <p id="map-quest-empty" class="quest-empty">No locations in this route yet.</p>
         </div>
       </main>
     </div>
@@ -152,8 +171,8 @@
       <div class="modal-sheet">
         <div class="modal-head">
           <div>
-            <h3>Add Stop</h3>
-            <p>Search, curated picks, and nearby options.</p>
+            <h3>Add Location</h3>
+            <p>Search, curated picks, and nearby fitness options.</p>
           </div>
           <button id="close-add-stop-modal" class="ghost-btn tiny" type="button">Close</button>
         </div>
@@ -165,7 +184,7 @@
         </div>
 
         <div id="add-search-row" class="search-row">
-          <input id="add-stop-search" class="field-input" type="text" placeholder="Search restaurants / bars / coffee" />
+          <input id="add-stop-search" class="field-input" type="text" placeholder="Search trails, tracks, hills, or calisthenics parks" />
         </div>
 
         <div id="add-results" class="add-results"></div>
@@ -177,21 +196,21 @@
       <div class="modal-sheet save-sheet">
         <div class="modal-head">
           <div>
-            <h3>Save Plan</h3>
-            <p>Keep this plan in Saved Runs and optionally publish to Community Runs.</p>
+            <h3>Save Route</h3>
+            <p>Keep this route in Saved Routes and optionally publish to Community Routes.</p>
           </div>
           <button id="close-save-modal" class="ghost-btn tiny" type="button">Close</button>
         </div>
 
-        <label class="field-label" for="save-title-input">Plan title</label>
+        <label class="field-label" for="save-title-input">Route title</label>
         <input id="save-title-input" class="field-input" type="text" maxlength="80" />
 
         <label class="check-row" for="save-publish-toggle">
           <input id="save-publish-toggle" type="checkbox" />
-          <span>Publish to Community Runs</span>
+          <span>Publish to Community Routes</span>
         </label>
 
-        <button id="save-confirm-btn" class="solid-btn wide" type="button">Save plan</button>
+        <button id="save-confirm-btn" class="solid-btn wide" type="button">Save route</button>
       </div>
     </div>
 
@@ -200,8 +219,8 @@
       <div class="modal-sheet share-sheet">
         <div class="modal-head">
           <div>
-            <h3>Share Plan</h3>
-            <p>Send your plan anywhere.</p>
+            <h3>Share Route</h3>
+            <p>Send your route anywhere.</p>
           </div>
           <button id="close-share-modal" class="ghost-btn tiny" type="button">Close</button>
         </div>

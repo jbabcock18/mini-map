@@ -10,7 +10,7 @@ export const annRoyButlerTrailGeojson = {
       geometry: {
         type: "LineString",
         coordinates: [
-          [30.259452, -97.743902],
+          [-97.743902, 30.259452],
           [-97.77255, 30.26789],
           [-97.76768, 30.26696],
           [-97.76291, 30.26569],

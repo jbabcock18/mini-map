@@ -7,11 +7,11 @@ import {
 export const SHARE_PAYLOAD_VERSION = 1;
 
 export function defaultPlanTitle() {
-  return "My Plan";
+  return "My Route";
 }
 
 export function defaultVibe() {
-  return "Golden Hour";
+  return "Mixed Session";
 }
 
 export function createRunId(prefix = "run") {

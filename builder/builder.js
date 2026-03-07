@@ -73,6 +73,7 @@ const statStops = document.getElementById("stat-stops");
 const timelineList = document.getElementById("timeline-list");
 const addStopInlineButton = document.getElementById("add-stop-inline-btn");
 const optimizeOrderButton = document.getElementById("optimize-order-btn");
+const catalogCategoryFilters = document.getElementById("catalog-category-filters");
 
 const sharePlanButton = document.getElementById("share-plan-btn");
 const copySummaryButton = document.getElementById("copy-summary-btn");
@@ -124,7 +125,7 @@ if (!config.accessToken) {
 }
 
 if (!placesCatalog.length) {
-  showToast("No places found in catalog.");
+  showToast("No fitness locations found in catalog.");
 }
 
 mapboxgl.accessToken = config.accessToken;
@@ -148,6 +149,7 @@ const state = {
   addStopTab: "search",
   addStopSearch: "",
   addStopInsertIndex: null,
+  catalogCategoryFilter: "all",
   hydratedFromPayload: Boolean(payloadRun),
   payloadSource: payloadRun?.source || "builder-default",
   discoverPreviewPlaceIds: [],
@@ -167,6 +169,7 @@ let routeDebounceHandle = null;
 let sidebarResizeTimeoutId = null;
 let mapResizeAnimationFrame = null;
 const routeCache = new Map();
+const CATALOG_FILTER_CATEGORIES = new Set(["calisthenics", "track", "trail", "hill", "stairs"]);
 
 function showToast(message) {
   if (!toast || !message) return;
@@ -178,6 +181,41 @@ function showToast(message) {
   toastTimeoutId = window.setTimeout(() => {
     toast.classList.add("hidden");
   }, 2200);
+}
+
+function isAllowedCatalogFilter(value) {
+  return value === "all" || CATALOG_FILTER_CATEGORIES.has(value);
+}
+
+function getFilteredCatalogPlaces() {
+  if (!isAllowedCatalogFilter(state.catalogCategoryFilter) || state.catalogCategoryFilter === "all") {
+    return placesCatalog;
+  }
+  return placesCatalog.filter((place) => place.category === state.catalogCategoryFilter);
+}
+
+function renderCatalogCategoryFilters() {
+  if (!catalogCategoryFilters) return;
+  const activeCategory = isAllowedCatalogFilter(state.catalogCategoryFilter)
+    ? state.catalogCategoryFilter
+    : "all";
+  catalogCategoryFilters.querySelectorAll("[data-category]").forEach((button) => {
+    if (!(button instanceof HTMLButtonElement)) return;
+    button.classList.toggle("is-active", button.dataset.category === activeCategory);
+  });
+}
+
+function setCatalogCategoryFilter(nextCategory) {
+  const normalized = typeof nextCategory === "string" ? nextCategory : "all";
+  state.catalogCategoryFilter = isAllowedCatalogFilter(normalized) ? normalized : "all";
+  renderCatalogCategoryFilters();
+  updateMapSources();
+  if (!addStopModal.classList.contains("hidden")) {
+    renderAddStopResults();
+  }
+  if (!getRunPlaces().length) {
+    fitRouteOrCatalog();
+  }
 }
 
 function loadSharedRunFromUrl() {
@@ -259,7 +297,7 @@ async function loadCuratedRuns() {
         const record = createRunRecord(
           {
             id: run.id || `curated-${index + 1}`,
-            title: run.title || run.name || `Curated Run ${index + 1}`,
+            title: run.title || run.name || `Curated Route ${index + 1}`,
             vibe: run.vibe || defaultVibe(),
             placeIds: normalizedIds,
             source: "curated",
@@ -288,7 +326,7 @@ function loadConfigCommunityRuns() {
     .map((run, index) =>
       createRunFromIds({
         id: run.id || `community-${index + 1}`,
-        title: run.title || run.name || `Community Run ${index + 1}`,
+        title: run.title || run.name || `Community Route ${index + 1}`,
         vibe: run.vibe || defaultVibe(),
         placeIds: run.placeIds || [],
         source: "config-community",
@@ -300,7 +338,7 @@ function loadConfigCommunityRuns() {
 }
 
 function runStatLine(run) {
-  return `${run.placeIds.length} stops • ${formatDistanceMiles(run.distanceKm)} • ${formatMinutes(run.durationMin)}`;
+  return `${run.placeIds.length} locations • ${formatDistanceMiles(run.distanceKm)} • ${formatMinutes(run.durationMin)}`;
 }
 
 function sortCommunityRuns(runs) {
@@ -677,7 +715,7 @@ function shortestPathOrder(distanceMatrix) {
 function optimizeRunOrder() {
   const runPlaces = getRunPlaces();
   if (runPlaces.length < 3) {
-    showToast("Need at least 3 stops to optimize order.");
+    showToast("Need at least 3 locations to optimize order.");
     return;
   }
 
@@ -707,7 +745,7 @@ function renderTimeline() {
     const empty = document.createElement("div");
     empty.className = "empty-state";
     empty.innerHTML =
-      '<p>No stops yet. Add a stop to start your timeline.</p><button id="empty-add-stop" class="solid-btn" type="button">+ Add a stop</button>';
+      '<p>No locations yet. Add one to start your route.</p><button id="empty-add-stop" class="solid-btn" type="button">+ Add location</button>';
     timelineList.append(empty);
     const emptyButton = empty.querySelector("#empty-add-stop");
     emptyButton?.addEventListener("click", () => openAddStopModal(null));
@@ -774,7 +812,7 @@ function renderTimeline() {
       }, "+");
       actions.append(addAfterButton);
 
-      const removeButton = createIconButton("Remove stop", "trash-2", () => {
+      const removeButton = createIconButton("Remove location", "trash-2", () => {
         removePlaceFromPlan(place.id);
       }, "");
       removeButton.classList.add("danger");
@@ -826,7 +864,7 @@ function renderTimeline() {
       segment.className = "travel-segment";
 
       const segmentLabel = document.createElement("p");
-      segmentLabel.textContent = `${formatDistanceMiles(segmentDistance)} between stops`;
+      segmentLabel.textContent = `${formatDistanceMiles(segmentDistance)} between locations`;
       segment.append(segmentLabel);
 
       if (state.mode === "edit") {
@@ -864,7 +902,7 @@ function distanceFromAnchor(place) {
 
 function getAddStopResults() {
   const query = state.addStopSearch.trim().toLowerCase();
-  const placesNotUsed = placesCatalog.filter((place) => !state.runPlaceIds.includes(place.id));
+  const placesNotUsed = getFilteredCatalogPlaces().filter((place) => !state.runPlaceIds.includes(place.id));
 
   if (state.addStopTab === "search") {
     if (!query) return placesNotUsed.slice(0, 18);
@@ -877,10 +915,14 @@ function getAddStopResults() {
   }
 
   if (state.addStopTab === "curated") {
-    const coffee = placesNotUsed.filter((place) => place.category === "coffee").slice(0, 5);
-    const restaurant = placesNotUsed.filter((place) => place.category === "restaurant").slice(0, 6);
-    const bar = placesNotUsed.filter((place) => place.category === "bar").slice(0, 6);
-    return [...coffee, ...restaurant, ...bar].slice(0, 20);
+    const categoryOrder = ["calisthenics", "track", "trail", "hill", "stairs"];
+    const categorized = categoryOrder.flatMap((category) =>
+      placesNotUsed.filter((place) => place.category === category).slice(0, 4)
+    );
+    const fallback = placesNotUsed
+      .filter((place) => !categoryOrder.includes(place.category))
+      .slice(0, 6);
+    return [...categorized, ...fallback].slice(0, 20);
   }
 
   return [...placesNotUsed]
@@ -900,7 +942,7 @@ function renderAddStopResults() {
   if (!results.length) {
     const empty = document.createElement("p");
     empty.className = "empty-state-text";
-    empty.textContent = "No matching places.";
+    empty.textContent = "No matching locations.";
     addResults.append(empty);
     return;
   }
@@ -916,11 +958,11 @@ function renderAddStopResults() {
 
     const pill = document.createElement("span");
     pill.className = categoryPillClass(place.category);
-    pill.textContent = place.category;
+    pill.textContent = categoryUpper(place.category);
 
     const distanceText = document.createElement("span");
     distanceText.className = "distance-meta";
-    distanceText.textContent = `${formatDistanceMiles(distanceFromAnchor(place))} from last stop`;
+    distanceText.textContent = `${formatDistanceMiles(distanceFromAnchor(place))} from last location`;
 
     top.append(pill, distanceText);
 
@@ -1087,7 +1129,7 @@ function createDiscoverRunCard(
   const useBtn = document.createElement("button");
   useBtn.type = "button";
   useBtn.className = "load-btn vote-btn";
-  useBtn.textContent = "Use this plan";
+  useBtn.textContent = "Use this route";
   useBtn.addEventListener("click", () => useRunFromDiscover(run, source));
 
   actions.append(previewBtn, useBtn);
@@ -1107,7 +1149,7 @@ function createDiscoverRunCard(
     renameBtn.className = "load-btn";
     renameBtn.textContent = "Rename";
     renameBtn.addEventListener("click", () => {
-      const next = window.prompt("Rename saved run", run.title);
+      const next = window.prompt("Rename saved route", run.title);
       if (!next || !next.trim()) return;
       renameSavedRun(run.id, next.trim(), placeById);
       void refreshDiscoverData();
@@ -1133,7 +1175,7 @@ function renderDiscoverList(
   if (!runs.length) {
     const empty = document.createElement("p");
     empty.className = "empty-library";
-    empty.textContent = "No runs yet.";
+    empty.textContent = "No routes yet.";
     targetNode.append(empty);
     return;
   }
@@ -1146,8 +1188,8 @@ function renderDiscoverList(
 function renderRunOfDayCard(run) {
   if (!runOfDayTitleSidebar || !runOfDayMetaSidebar) return;
   if (!run) {
-    runOfDayTitleSidebar.textContent = "No curated runs available";
-    runOfDayMetaSidebar.textContent = "Add curated runs to /data/curated-runs.json.";
+    runOfDayTitleSidebar.textContent = "No curated routes available";
+    runOfDayMetaSidebar.textContent = "Add curated routes to /data/curated-runs.json.";
     previewRunOfDaySidebarButton.disabled = true;
     useRunOfDaySidebarButton.disabled = true;
     saveRunOfDaySidebarButton.disabled = true;
@@ -1197,7 +1239,7 @@ async function refreshDiscoverData() {
       showSave: true,
     });
   } else if (randomRunSidebarPreview) {
-    randomRunSidebarPreview.innerHTML = '<p class="empty-library">Click Roll to preview a random run.</p>';
+    randomRunSidebarPreview.innerHTML = '<p class="empty-library">Click Roll to preview a random route.</p>';
   }
   renderDiscoverList(savedRunsSidebarList, savedRuns, {
     allowRename: true,
@@ -1237,7 +1279,7 @@ function buildSummaryText(partifulFormat = false) {
   if (partifulFormat) {
     const lines = [
       `${state.planTitle} (${state.vibe})`,
-      `Stops: ${runPlaces.length} • Distance: ${formatDistanceMiles(resolvedDistance)}`,
+      `Locations: ${runPlaces.length} • Distance: ${formatDistanceMiles(resolvedDistance)}`,
       "",
       ...runPlaces.map((place, index) => `${index + 1}. ${place.name} — ${place.address}`),
     ];
@@ -1247,11 +1289,11 @@ function buildSummaryText(partifulFormat = false) {
   const lines = [
     `${state.planTitle}`,
     `Vibe: ${state.vibe}`,
-    `Stops: ${runPlaces.length}`,
+    `Locations: ${runPlaces.length}`,
     `Distance: ${formatDistanceMiles(resolvedDistance)}`,
     `Duration: ${formatMinutes(durationMin)}`,
     "",
-    "Timeline",
+    "Route",
     ...runPlaces.map((place, index) => `${index + 1}. ${place.name} (${categoryLabel(place.category)})`),
   ];
   return lines.join("\n");
@@ -1303,7 +1345,7 @@ function downloadShareCard() {
     </linearGradient>
   </defs>
   <rect width="1080" height="1350" fill="url(#bg)"/>
-  <text x="44" y="78" font-size="22" fill="#4272c6">Mini Map</text>
+  <text x="44" y="78" font-size="22" fill="#4272c6">Fitness Finder</text>
   <text x="44" y="122" font-size="44" font-weight="700" fill="#14233a">${title}</text>
   <text x="44" y="152" font-size="24" fill="#3d5578">Vibe: ${vibe}</text>
   ${lineItems}
@@ -1314,7 +1356,7 @@ function downloadShareCard() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${(state.planTitle || "mini-map-plan").replace(/\s+/g, "-").toLowerCase()}.svg`;
+  a.download = `${(state.planTitle || "fitness-finder-route").replace(/\s+/g, "-").toLowerCase()}.svg`;
   a.click();
   URL.revokeObjectURL(url);
   showToast("Downloaded share card.");
@@ -1322,7 +1364,7 @@ function downloadShareCard() {
 
 function addPlaceToPlan(placeId, insertIndex = null) {
   if (state.runPlaceIds.includes(placeId)) {
-    showToast("That stop is already in your plan.");
+    showToast("That location is already in your route.");
     return;
   }
 
@@ -1337,7 +1379,7 @@ function addPlaceToPlan(placeId, insertIndex = null) {
   syncState();
 
   const place = placeById.get(placeId);
-  showToast(`Added ${place?.name || "stop"}.`);
+  showToast(`Added ${place?.name || "location"}.`);
 }
 
 function removePlaceFromPlan(placeId) {
@@ -1369,7 +1411,7 @@ function saveCurrentPlan() {
   }
 
   if (state.runPlaceIds.length < 2) {
-    showToast("Add at least 2 stops before saving.");
+    showToast("Add at least 2 locations before saving.");
     return;
   }
 
@@ -1401,7 +1443,7 @@ function saveCurrentPlan() {
   renderPlanHeader();
   closeSaveModal();
   requestDiscoverRefresh();
-  showToast(isPublished ? "Saved and published to Community Runs." : "Saved to Saved Runs.");
+  showToast(isPublished ? "Saved and published to Community Routes." : "Saved to Saved Routes.");
 }
 
 function buildPointsGeoJSON(places, withOrder = false) {
@@ -1448,7 +1490,7 @@ function buildRunRouteGeoJSON(places) {
 function updateMapSources() {
   if (!map.isStyleLoaded()) return;
   const runPlaces = getRunPlaces();
-  map.getSource("catalog-places")?.setData(buildPointsGeoJSON(placesCatalog));
+  map.getSource("catalog-places")?.setData(buildPointsGeoJSON(getFilteredCatalogPlaces()));
   map.getSource("run-route")?.setData(buildRunRouteGeoJSON(runPlaces));
   map.getSource("run-stops")?.setData(buildPointsGeoJSON(runPlaces, true));
 }
@@ -1582,20 +1624,24 @@ function boundsForPlaces(places) {
 
 function fitRouteOrCatalog() {
   const runPlaces = getRunPlaces();
-  const target = runPlaces.length ? runPlaces : placesCatalog;
+  const catalogPlaces = getFilteredCatalogPlaces();
+  const target = runPlaces.length ? runPlaces : catalogPlaces.length ? catalogPlaces : placesCatalog;
   const bounds = boundsForPlaces(target);
   if (!bounds) return;
   map.fitBounds(bounds, { padding: 86, duration: 820, pitch: config.pitch ?? 58 });
 }
 
-function popupHtml(feature) {
+function popupHtml(feature, { isCatalog = false } = {}) {
   const props = feature.properties || {};
   const address = props.address ? `<br />${props.address}` : "";
   const website = props.website
     ? `<br /><a href="${props.website}" target="_blank" rel="noopener noreferrer">Website</a>`
     : "";
-  const stopNumber = props.order ? `<br /><em>Stop ${props.order}</em>` : "";
-  return `<strong>${props.name}</strong><br />${categoryLabel(props.category || "restaurant")}${stopNumber}${address}${website}`;
+  const locationNumber = props.order ? `<br /><em>Route location ${props.order}</em>` : "";
+  const catalogHint = isCatalog
+    ? `<br /><em>${state.mode === "edit" ? "Clicking map points adds to your route." : "Switch to Edit mode to add this location."}</em>`
+    : "";
+  return `<strong>${props.name}</strong><br />${categoryLabel(props.category || "trail")}${locationNumber}${address}${website}${catalogHint}`;
 }
 
 function syncState() {
@@ -1737,6 +1783,16 @@ function setupSourcesAndLayers() {
           "circle-color": [
             "match",
             ["downcase", ["get", "category"]],
+            "calisthenics",
+            "#24b174",
+            "track",
+            "#418bff",
+            "trail",
+            "#2bb3a3",
+            "hill",
+            "#f2993a",
+            "stairs",
+            "#915df5",
             "coffee",
             "#b9824d",
             "restaurant",
@@ -1913,6 +1969,10 @@ map.on("load", () => {
   map.on("click", "catalog-places-layer", (event) => {
     const feature = event.features && event.features[0];
     if (!feature) return;
+    new mapboxgl.Popup()
+      .setLngLat(event.lngLat)
+      .setHTML(popupHtml(feature, { isCatalog: true }))
+      .addTo(map);
     const placeId = feature.properties && feature.properties.id;
     if (placeId && state.mode === "edit") {
       addPlaceToPlan(placeId, null);
@@ -1975,6 +2035,13 @@ sidebarDiscoverButton?.addEventListener("click", () => {
   setSidebarView("discover");
 });
 
+catalogCategoryFilters?.querySelectorAll("[data-category]").forEach((button) => {
+  if (!(button instanceof HTMLButtonElement)) return;
+  button.addEventListener("click", () => {
+    setCatalogCategoryFilter(button.dataset.category || "all");
+  });
+});
+
 previewRunOfDaySidebarButton?.addEventListener("click", () => {
   if (!state.discoverData.runOfDay) return;
   previewRunOnMap(state.discoverData.runOfDay);
@@ -1993,7 +2060,7 @@ saveRunOfDaySidebarButton?.addEventListener("click", () => {
 randomRunSidebarButton?.addEventListener("click", () => {
   const picked = pickRandomRun(state.discoverData.randomPool || []);
   if (!picked) {
-    showToast("No random runs available.");
+    showToast("No random routes available.");
     return;
   }
   state.discoverData.randomLastRun = picked;
@@ -2054,12 +2121,12 @@ headerSaveButton.addEventListener("click", openSaveModal);
 saveConfirmButton.addEventListener("click", saveCurrentPlan);
 
 copySummaryButton?.addEventListener("click", async () => {
-  await copyText(buildSummaryText(false), "Copied plan summary.");
+  await copyText(buildSummaryText(false), "Copied route summary.");
   recordRunInHistory("share-summary");
 });
 
 copyLinkButton?.addEventListener("click", async () => {
-  await copyText(buildShareLink(), "Copied plan link.");
+  await copyText(buildShareLink(), "Copied route link.");
   recordRunInHistory("share-link");
 });
 
@@ -2069,12 +2136,12 @@ downloadCardButton?.addEventListener("click", () => {
 });
 
 modalCopyLinkButton.addEventListener("click", async () => {
-  await copyText(buildShareLink(), "Copied plan link.");
+  await copyText(buildShareLink(), "Copied route link.");
   recordRunInHistory("share-link");
 });
 
 modalCopySummaryButton.addEventListener("click", async () => {
-  await copyText(buildSummaryText(false), "Copied text summary.");
+  await copyText(buildSummaryText(false), "Copied route summary.");
   recordRunInHistory("share-summary");
 });
 
@@ -2092,7 +2159,7 @@ if (navigator.share) {
         text: buildSummaryText(false),
         url: buildShareLink(),
       });
-      showToast("Shared plan.");
+      showToast("Shared route.");
       recordRunInHistory("share-native");
     } catch (error) {
       if (error && error.name !== "AbortError") {
@@ -2126,6 +2193,7 @@ document.addEventListener("keydown", (event) => {
 setMode("view");
 setSidebarView("builder");
 setSidebarHidden(state.sidebarHidden);
+renderCatalogCategoryFilters();
 renderAddStopResults();
 renderPlanHeader();
 renderTimeline();
@@ -2133,5 +2201,5 @@ renderMapQuest();
 requestDiscoverRefresh();
 
 if (state.hydratedFromPayload) {
-  showToast("Shared plan loaded in view mode.");
+  showToast("Shared route loaded in view mode.");
 }
