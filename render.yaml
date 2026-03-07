@@ -1,0 +1,8 @@
+services:
+  - type: static_site
+    name: mini-map
+    buildCommand: sh render-build.sh
+    publishDir: public
+    envVars:
+      - key: MAPBOX_ACCESS_TOKEN
+        sync: false

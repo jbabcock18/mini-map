@@ -38,6 +38,32 @@ function featureCollection(features) {
   };
 }
 
+function showFatalConfigError(message) {
+  if (toast) {
+    toast.textContent = message;
+    toast.classList.remove("hidden");
+  }
+
+  const existing = document.getElementById("fatal-config-error");
+  if (existing) return;
+
+  const banner = document.createElement("div");
+  banner.id = "fatal-config-error";
+  banner.style.position = "fixed";
+  banner.style.left = "28px";
+  banner.style.bottom = "28px";
+  banner.style.zIndex = "20";
+  banner.style.maxWidth = "420px";
+  banner.style.padding = "14px 16px";
+  banner.style.background = "rgba(32, 37, 44, 0.94)";
+  banner.style.color = "#f4f6f9";
+  banner.style.borderRadius = "12px";
+  banner.style.fontSize = "14px";
+  banner.style.lineHeight = "1.4";
+  banner.textContent = message;
+  document.body.appendChild(banner);
+}
+
 function categoryColorExpression() {
   return [
     "match",
@@ -96,6 +122,7 @@ function filteredSegmentFeatures() {
 }
 
 if (!config.accessToken) {
+  showFatalConfigError("Mapbox token missing. Check deployed config.js or Render MAPBOX_ACCESS_TOKEN.");
   throw new Error("MAPBOX_CONFIG.accessToken is required");
 }
 

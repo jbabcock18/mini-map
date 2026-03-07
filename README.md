@@ -79,6 +79,17 @@ python3 -m http.server 8000
 
 - `http://localhost:8000/`
 
+## Render Deployment
+
+Use a Render `Static Site`.
+
+Settings:
+- Build Command: `sh render-build.sh`
+- Publish Directory: `public`
+- Environment Variable: `MAPBOX_ACCESS_TOKEN`
+
+This repo includes [render.yaml](/Users/jackbabcock/Desktop/mini-map/render.yaml) and [render-build.sh](/Users/jackbabcock/Desktop/mini-map/render-build.sh) so Render can generate `public/config.js` during deploy.
+
 ## Notes
 
 - App settings live in `app-config.js` and are committed to git.
