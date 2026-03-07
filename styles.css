@@ -235,6 +235,42 @@ body {
   align-items: center;
 }
 
+.finder-panel {
+  display: grid;
+  gap: 0.58rem;
+}
+
+.category-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.36rem;
+}
+
+.filter-chip {
+  border: 1px solid rgba(154, 181, 221, 0.64);
+  background: rgba(246, 251, 255, 0.92);
+  color: #2d4d79;
+  border-radius: 999px;
+  padding: 0.3rem 0.58rem;
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-chip.is-active {
+  color: #ffffff;
+  background: linear-gradient(120deg, #6ca6ff, #3f82ff);
+  border-color: rgba(63, 130, 255, 0.7);
+}
+
+.finder-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #597091;
+  line-height: 1.35;
+}
+
 .section-heading-row h2 {
   margin: 0;
   font-family: "Sora", sans-serif;
@@ -293,12 +329,36 @@ body {
   background: linear-gradient(130deg, #c98954, #a55f2e);
 }
 
+.tone-calisthenics {
+  background: linear-gradient(130deg, #2dbe82, #1f8f60);
+}
+
+.tone-track {
+  background: linear-gradient(130deg, #448cff, #2d63d8);
+}
+
+.tone-trail {
+  background: linear-gradient(130deg, #38b89c, #238672);
+}
+
+.tone-hill {
+  background: linear-gradient(130deg, #f09b3a, #cf6f17);
+}
+
+.tone-stairs {
+  background: linear-gradient(130deg, #9864ff, #6f42d9);
+}
+
 .tone-restaurant {
   background: linear-gradient(130deg, #8f9aab, #687588);
 }
 
 .tone-bar {
   background: linear-gradient(130deg, #5889de, #3f67bb);
+}
+
+.tone-generic {
+  background: linear-gradient(130deg, #7fa1c8, #5f7da1);
 }
 
 .stop-main {
@@ -834,6 +894,36 @@ button:hover {
   color: #7f6247;
 }
 
+.pill-calisthenics {
+  background: rgba(37, 174, 120, 0.12);
+  border-color: rgba(37, 174, 120, 0.28);
+  color: #207153;
+}
+
+.pill-track {
+  background: rgba(68, 139, 255, 0.12);
+  border-color: rgba(68, 139, 255, 0.28);
+  color: #315fa8;
+}
+
+.pill-trail {
+  background: rgba(56, 184, 156, 0.11);
+  border-color: rgba(56, 184, 156, 0.27);
+  color: #226d60;
+}
+
+.pill-hill {
+  background: rgba(240, 155, 58, 0.12);
+  border-color: rgba(240, 155, 58, 0.28);
+  color: #8f541a;
+}
+
+.pill-stairs {
+  background: rgba(152, 100, 255, 0.11);
+  border-color: rgba(152, 100, 255, 0.28);
+  color: #5e3da2;
+}
+
 .pill-restaurant {
   background: rgba(137, 148, 165, 0.1);
   border-color: rgba(137, 148, 165, 0.24);
@@ -844,6 +934,12 @@ button:hover {
   background: rgba(120, 164, 255, 0.11);
   border-color: rgba(120, 164, 255, 0.24);
   color: #5a6f98;
+}
+
+.pill-generic {
+  background: rgba(145, 167, 198, 0.12);
+  border-color: rgba(145, 167, 198, 0.25);
+  color: #5f7293;
 }
 
 .empty-state {

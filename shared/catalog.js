@@ -1,5 +1,32 @@
 const FALLBACK_CENTER = [-97.7431, 30.2672];
 
+const CATEGORY_ALIASES = {
+  calisthenics: "calisthenics",
+  "calisthenics-park": "calisthenics",
+  "outdoor-gym": "calisthenics",
+  track: "track",
+  "public-track": "track",
+  "running-track": "track",
+  trail: "trail",
+  trailhead: "trail",
+  "multi-use-trail": "trail",
+  hill: "hill",
+  "steep-hill": "hill",
+  incline: "hill",
+  stairs: "stairs",
+  "stadium-steps": "stairs",
+  "stairs-workout": "stairs",
+  coffee: "coffee",
+  restaurant: "restaurant",
+  bar: "bar",
+};
+
+function normalizeCategory(rawCategory) {
+  if (typeof rawCategory !== "string" || !rawCategory.trim()) return "trail";
+  const normalized = rawCategory.trim().toLowerCase().replace(/\s+/g, "-");
+  return CATEGORY_ALIASES[normalized] || normalized;
+}
+
 function normalizePlace(rawPlace, index) {
   if (!rawPlace || typeof rawPlace !== "object") return null;
   if (!Array.isArray(rawPlace.coordinates) || rawPlace.coordinates.length !== 2) return null;
@@ -10,7 +37,7 @@ function normalizePlace(rawPlace, index) {
   const name = typeof rawPlace.name === "string" && rawPlace.name.trim() ? rawPlace.name.trim() : `Place ${index + 1}`;
   const address = typeof rawPlace.address === "string" ? rawPlace.address : "";
   const website = typeof rawPlace.website === "string" ? rawPlace.website : "";
-  const category = typeof rawPlace.category === "string" ? rawPlace.category.toLowerCase() : "restaurant";
+  const category = normalizeCategory(rawPlace.category);
 
   return {
     id,
@@ -78,21 +105,45 @@ export function getPlacesForIds(placeIds, placeById) {
 }
 
 export function categoryLabel(category) {
-  if (category === "coffee") return "Coffee";
-  if (category === "bar") return "Drinks";
-  return "Dinner";
+  const labels = {
+    calisthenics: "Calisthenics",
+    track: "Track",
+    trail: "Trail",
+    hill: "Hill",
+    stairs: "Stairs",
+    coffee: "Coffee",
+    bar: "Drinks",
+    restaurant: "Dinner",
+  };
+  return labels[category] || "Location";
 }
 
 export function categoryPillClass(category) {
-  if (category === "coffee") return "pill pill-coffee";
-  if (category === "bar") return "pill pill-bar";
-  return "pill pill-restaurant";
+  const classes = {
+    calisthenics: "pill pill-calisthenics",
+    track: "pill pill-track",
+    trail: "pill pill-trail",
+    hill: "pill pill-hill",
+    stairs: "pill pill-stairs",
+    coffee: "pill pill-coffee",
+    bar: "pill pill-bar",
+    restaurant: "pill pill-restaurant",
+  };
+  return classes[category] || "pill pill-generic";
 }
 
 export function categoryToneClass(category) {
-  if (category === "coffee") return "tone-coffee";
-  if (category === "bar") return "tone-bar";
-  return "tone-restaurant";
+  const classes = {
+    calisthenics: "tone-calisthenics",
+    track: "tone-track",
+    trail: "tone-trail",
+    hill: "tone-hill",
+    stairs: "tone-stairs",
+    coffee: "tone-coffee",
+    bar: "tone-bar",
+    restaurant: "tone-restaurant",
+  };
+  return classes[category] || "tone-generic";
 }
 
 function hashStringToSeed(input) {
@@ -106,14 +157,18 @@ function hashStringToSeed(input) {
 
 export function descriptorForPlace(place) {
   const seed = hashStringToSeed(place.id);
-  const rating = (4.1 + ((seed % 8) * 0.1)).toFixed(1);
-  const price = ["$", "$$", "$$$"][seed % 3];
+  const intensity = ["easy", "moderate", "hard"][seed % 3];
   const tagsByCategory = {
+    calisthenics: ["pull-up bars", "bodyweight-focused", "open-air setup"],
+    track: ["flat laps", "interval-friendly", "marked lanes"],
+    trail: ["scenic route", "mixed terrain", "steady mileage"],
+    hill: ["steep grade", "hill repeats", "power climbs"],
+    stairs: ["stair sets", "leg burner", "high-intensity"],
     coffee: ["quiet", "bright", "cozy"],
     restaurant: ["chef-driven", "date spot", "local fave"],
     bar: ["cocktails", "late-night", "lively"],
   };
-  const tagPool = tagsByCategory[place.category] || ["local"];
+  const tagPool = tagsByCategory[place.category] || ["training-friendly"];
   const tag = tagPool[seed % tagPool.length];
-  return `${rating} stars, ${price}, ${tag}`;
+  return `${tag} • ${intensity} effort`;
 }

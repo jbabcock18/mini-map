@@ -62,8 +62,8 @@ function parseCuratedData(raw) {
       const normalized = normalizeRunRecord(
         {
           id: run.id || `curated-${index + 1}`,
-          title: run.title || run.name || `Curated Run ${index + 1}`,
-          vibe: run.vibe || "Golden Hour",
+          title: run.title || run.name || `Curated Route ${index + 1}`,
+          vibe: run.vibe || "Mixed Session",
           placeIds,
           isFeatured: Boolean(run.isFeatured),
           isPublished: Boolean(run.tags?.includes("community")),
@@ -98,7 +98,7 @@ async function loadCuratedRuns() {
 }
 
 function runStatLine(run) {
-  return `${run.placeIds.length} stops • ${formatDistanceMiles(run.distanceKm)} • ${formatMinutes(run.durationMin)}`;
+  return `${run.placeIds.length} locations • ${formatDistanceMiles(run.distanceKm)} • ${formatMinutes(run.durationMin)}`;
 }
 
 function usePlan(run, source) {
@@ -145,7 +145,7 @@ function createRunCard(run, { source, includeRename = false } = {}) {
   const useButton = document.createElement("button");
   useButton.type = "button";
   useButton.className = "solid-btn";
-  useButton.textContent = "Use this plan";
+  useButton.textContent = "Use this route";
   useButton.addEventListener("click", () => usePlan(run, source));
   actions.append(useButton);
 
@@ -155,7 +155,7 @@ function createRunCard(run, { source, includeRename = false } = {}) {
     renameButton.className = "ghost-btn";
     renameButton.textContent = "Rename";
     renameButton.addEventListener("click", () => {
-      const next = window.prompt("Rename saved run", run.title);
+      const next = window.prompt("Rename saved route", run.title);
       if (!next || !next.trim()) return;
       renameSavedRun(run.id, next.trim(), placeById);
       void renderAll();
@@ -172,7 +172,7 @@ function renderSection(target, runs, { source, includeRename = false } = {}) {
   if (!runs.length) {
     const empty = document.createElement("p");
     empty.className = "empty-line";
-    empty.textContent = "No runs yet.";
+    empty.textContent = "No routes yet.";
     target.append(empty);
     return;
   }
@@ -211,8 +211,8 @@ function normalizeConfigCommunityRuns() {
       normalizeRunRecord(
         {
           id: run.id || `community-${index + 1}`,
-          title: run.name || run.title || `Community Run ${index + 1}`,
-          vibe: run.vibe || "Golden Hour",
+          title: run.name || run.title || `Community Route ${index + 1}`,
+          vibe: run.vibe || "Mixed Session",
           placeIds: normalizePlaceIds(run.placeIds, placeById),
           isFeatured: Boolean(run.isFeatured),
           isPublished: true,
@@ -252,8 +252,8 @@ async function renderAll() {
     runOfDayUseButton.disabled = false;
     runOfDayUseButton.onclick = () => usePlan(rotd, "discover-rotd");
   } else {
-    runOfDayTitle.textContent = "No curated runs available";
-    runOfDayMeta.textContent = "Add entries in data/curated-runs.json to enable this section.";
+    runOfDayTitle.textContent = "No curated routes available";
+    runOfDayMeta.textContent = "Add curated routes in data/curated-runs.json to enable this section.";
     runOfDayUseButton.disabled = true;
   }
 
