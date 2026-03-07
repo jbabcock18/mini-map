@@ -59,24 +59,28 @@ Each spot is interactive, filterable, and easy to open in directions.
 - `/styles.css` - visual system and responsive layout
 - `/app.js` - map logic and interactions
 - `/data/workout-areas.js` - Austin workout points and segments
-- `/config.js` - local Mapbox configuration
-- `/config.example.js` - starter config template
+- `/app-config.js` - tracked app configuration
+- `/config.js` - local Mapbox token only
+- `/config.example.js` - starter token template
 
 ## Local Development
 
-1. Set your token in `config.js` (or copy from `config.example.js`).
+1. Copy `config.example.js` to `config.js`.
 
-2. Start a static server:
+2. Set your Mapbox token in `config.js`.
+
+3. Start a static server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-3. Open:
+4. Open:
 
 - `http://localhost:8000/`
 
 ## Notes
 
-- `/data/workout-areas.js` is intentionally empty right now.
+- App settings live in `app-config.js` and are committed to git.
+- `config.js` is intentionally gitignored so only the access token stays local.
 - Add your own point features to `WORKOUT_AREAS_GEOJSON.features` and line features to `WORKOUT_SEGMENTS_GEOJSON.features`.

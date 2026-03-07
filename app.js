@@ -4,7 +4,10 @@ import {
   WORKOUT_SEGMENTS_GEOJSON,
 } from "./data/workout-areas.js";
 
-const config = window.MAPBOX_CONFIG || {};
+const config = {
+  ...(window.APP_CONFIG || {}),
+  ...(window.MAPBOX_CONFIG || {}),
+};
 
 const categoryNav = document.getElementById("category-nav");
 const toast = document.getElementById("toast");
