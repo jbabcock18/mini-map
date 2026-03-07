@@ -3,223 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mini Map</title>
+    <title>Mini Map - Austin Workout Explorer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
     <link
-      href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css"
-      rel="stylesheet"
+      rel="icon"
+      type="image/png"
+      href="./assets/circle-greek-frame-round-meander-border-decoration-elements-pattern-png.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="./assets/circle-greek-frame-round-meander-border-decoration-elements-pattern-png.png"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="left-panel">
-        <div class="sidebar-mode-switch">
-          <button id="sidebar-builder-btn" class="tab-btn is-active" type="button">Builder</button>
-          <button id="sidebar-discover-btn" class="tab-btn" type="button">Discover</button>
-        </div>
+    <div id="map" aria-label="Map of Austin workout areas"></div>
+    <div class="brand-mark" aria-hidden="true"></div>
 
-        <div id="builder-sidebar-view" class="sidebar-view is-active">
-          <div class="left-panel-scroll">
-            <section class="panel-card plan-header" id="plan-header">
-              <div class="plan-header-top">
-                <div>
-                  <p class="eyebrow">Mini Map</p>
-                  <h1 id="plan-title-display">My Plan</h1>
-                  <input id="plan-title-input" class="field-input hidden" type="text" maxlength="80" />
-                </div>
-                <div class="header-ctas">
-                  <button id="header-share-btn" class="solid-btn" type="button">Share</button>
-                  <button id="header-save-btn" class="ghost-btn" type="button">Save</button>
-                  <button id="edit-toggle-btn" class="ghost-btn" type="button">Edit</button>
-                </div>
-              </div>
-              <div class="vibe-row">
-                <span class="meta-label">Vibe</span>
-                <span id="vibe-display" class="vibe-pill">Golden Hour</span>
-                <select id="vibe-input" class="field-select hidden">
-                  <option>Golden Hour</option>
-                  <option>Slow Morning</option>
-                  <option>Date Night</option>
-                  <option>Bar Crawl</option>
-                  <option>Birthday Energy</option>
-                </select>
-              </div>
-              <div class="stats-inline">
-                <span class="stat-inline-item">
-                  <strong id="stat-distance">0.0 mi</strong>
-                  <small>Distance</small>
-                </span>
-                <span class="stat-inline-item">
-                  <strong id="stat-walking">0m</strong>
-                  <small>Walk</small>
-                </span>
-                <span class="stat-inline-item">
-                  <strong id="stat-stops">0</strong>
-                  <small>Stops</small>
-                </span>
-              </div>
-            </section>
-
-            <section class="panel-card timeline-panel">
-              <div class="section-heading-row">
-                <div>
-                  <h2>Timeline</h2>
-                  <p>Stops and route distance</p>
-                </div>
-                <div class="section-actions">
-                  <button id="add-stop-inline-btn" class="ghost-btn subtle" type="button">+ Add a stop</button>
-                  <button id="optimize-order-btn" class="ghost-btn subtle hidden" type="button">
-                    Optimize Order
-                  </button>
-                </div>
-              </div>
-              <div id="timeline-list" class="timeline-list"></div>
-            </section>
-          </div>
-
-        </div>
-
-        <div id="discover-sidebar-view" class="sidebar-view hidden">
-          <div class="left-panel-scroll">
-            <section class="panel-card discover-hero-panel">
-              <p class="eyebrow">Discover</p>
-              <h2 class="discover-panel-title">Run of the Day</h2>
-              <h3 id="run-of-day-title-sidebar" class="discover-run-title">Loading daily run...</h3>
-              <p id="run-of-day-meta-sidebar" class="stop-meta"></p>
-              <div class="discover-actions">
-                <button id="preview-run-of-day-sidebar" class="ghost-btn" type="button">Preview</button>
-                <button id="use-run-of-day-sidebar" class="solid-btn" type="button">Use this plan</button>
-                <button id="save-run-of-day-sidebar" class="ghost-btn" type="button">Save</button>
-              </div>
-            </section>
-
-            <section class="panel-card">
-              <div class="section-heading-row">
-                <div>
-                  <h2>Random Run</h2>
-                  <p>One-click inspiration</p>
-                </div>
-                <button id="random-run-sidebar-btn" class="ghost-btn subtle" type="button">Roll</button>
-              </div>
-              <div id="random-run-sidebar-preview" class="discover-runs-list"></div>
-            </section>
-
-            <section class="panel-card">
-              <div class="section-heading-row">
-                <div>
-                  <h2>Saved Runs</h2>
-                  <p>Plans you saved, from yourself or the community</p>
-                </div>
-              </div>
-              <div id="saved-runs-sidebar-list" class="discover-runs-list"></div>
-            </section>
-
-            <section class="panel-card">
-              <div class="section-heading-row">
-                <div>
-                  <h2>Community Runs</h2>
-                  <p>Featured then recent</p>
-                </div>
-              </div>
-              <div id="community-runs-sidebar-list" class="discover-runs-list"></div>
-            </section>
-          </div>
-        </div>
-      </aside>
-
-      <main class="map-stage">
-        <div id="map"></div>
-        <button id="sidebar-toggle" class="ghost-btn sidebar-toggle" type="button">Hide Sidebar</button>
-
-        <div id="map-quest-card" class="quest-card">
-          <h2>Stops</h2>
-          <ol id="map-quest-list" class="quest-list"></ol>
-          <p id="map-quest-empty" class="quest-empty">No stops in this plan yet.</p>
-        </div>
-      </main>
-    </div>
+    <nav id="category-nav" class="floating-rail rail-nav" aria-label="Workout category filters">
+      <button class="rail-link is-active" type="button" data-category="all">all</button>
+      <button class="rail-link" type="button" data-category="calisthenics">calisthenics</button>
+      <!-- <button class="rail-link" type="button" data-category="track">tracks</button> -->
+      <button class="rail-link" type="button" data-category="trail">trails</button>
+      <button class="rail-link" type="button" data-category="hill">hills</button>
+    </nav>
 
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-    <div id="add-stop-modal" class="modal hidden" aria-hidden="true">
-      <div class="modal-backdrop" data-close="add-stop-modal"></div>
-      <div class="modal-sheet">
-        <div class="modal-head">
-          <div>
-            <h3>Add Stop</h3>
-            <p>Search, curated picks, and nearby options.</p>
-          </div>
-          <button id="close-add-stop-modal" class="ghost-btn tiny" type="button">Close</button>
-        </div>
-
-        <div class="tab-row add-tabs">
-          <button id="add-tab-search" class="tab-btn is-active" type="button">Search</button>
-          <button id="add-tab-curated" class="tab-btn" type="button">Curated</button>
-          <button id="add-tab-nearby" class="tab-btn" type="button">Nearby</button>
-        </div>
-
-        <div id="add-search-row" class="search-row">
-          <input id="add-stop-search" class="field-input" type="text" placeholder="Search restaurants / bars / coffee" />
-        </div>
-
-        <div id="add-results" class="add-results"></div>
-      </div>
-    </div>
-
-    <div id="save-modal" class="modal hidden" aria-hidden="true">
-      <div class="modal-backdrop" data-close="save-modal"></div>
-      <div class="modal-sheet save-sheet">
-        <div class="modal-head">
-          <div>
-            <h3>Save Plan</h3>
-            <p>Keep this plan in Saved Runs and optionally publish to Community Runs.</p>
-          </div>
-          <button id="close-save-modal" class="ghost-btn tiny" type="button">Close</button>
-        </div>
-
-        <label class="field-label" for="save-title-input">Plan title</label>
-        <input id="save-title-input" class="field-input" type="text" maxlength="80" />
-
-        <label class="check-row" for="save-publish-toggle">
-          <input id="save-publish-toggle" type="checkbox" />
-          <span>Publish to Community Runs</span>
-        </label>
-
-        <button id="save-confirm-btn" class="solid-btn wide" type="button">Save plan</button>
-      </div>
-    </div>
-
-    <div id="share-modal" class="modal hidden" aria-hidden="true">
-      <div class="modal-backdrop" data-close="share-modal"></div>
-      <div class="modal-sheet share-sheet">
-        <div class="modal-head">
-          <div>
-            <h3>Share Plan</h3>
-            <p>Send your plan anywhere.</p>
-          </div>
-          <button id="close-share-modal" class="ghost-btn tiny" type="button">Close</button>
-        </div>
-
-        <div class="share-preview" id="share-preview"></div>
-
-        <div class="share-actions">
-          <button id="modal-copy-link-btn" class="solid-btn wide" type="button">Copy link</button>
-          <button id="modal-copy-summary-btn" class="ghost-btn wide" type="button">Copy text summary</button>
-          <button id="modal-copy-partiful-btn" class="ghost-btn wide" type="button">Copy for Partiful</button>
-          <button id="modal-native-share-btn" class="ghost-btn wide" type="button">Send via...</button>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./config.js"></script>
-    <script type="module" src="./builder/builder.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
