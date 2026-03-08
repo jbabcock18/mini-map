@@ -25,14 +25,50 @@
   <body>
     <div id="map" aria-label="Map of Austin workout areas"></div>
     <div class="brand-mark" aria-hidden="true"></div>
+    <button id="notes-toggle" class="notes-toggle" type="button" aria-expanded="false">
+      notes
+    </button>
 
-    <nav id="category-nav" class="floating-rail rail-nav" aria-label="Workout category filters">
-      <button class="rail-link is-active" type="button" data-category="all">all</button>
-      <button class="rail-link" type="button" data-category="calisthenics">calisthenics</button>
-      <!-- <button class="rail-link" type="button" data-category="track">tracks</button> -->
-      <button class="rail-link" type="button" data-category="trail">trails</button>
-      <button class="rail-link" type="button" data-category="hill">hills</button>
-    </nav>
+    <nav id="category-nav" class="floating-rail rail-nav" aria-label="Map filters"></nav>
+    <aside class="map-legend" aria-label="Fitness legend">
+      <p class="legend-title">fitness legend</p>
+      <div class="legend-item">
+        <img
+          class="legend-icon"
+          src="./assets/marker_blue-removebg-preview.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <span>calisthenics</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-line legend-line-trail" aria-hidden="true"></span>
+        <span>trails</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-line legend-line-track" aria-hidden="true"></span>
+        <span>tracks</span>
+      </div>
+      <div class="legend-item">
+        <img
+          class="legend-icon"
+          src="./assets/marker_yellow-removebg-preview.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <span>hills</span>
+      </div>
+    </aside>
+    <aside id="notes-panel" class="notes-panel hidden" aria-label="Location notes">
+      <div class="notes-panel-header">
+        <div>
+          <p class="notes-eyebrow">field notes</p>
+          <h2 class="notes-title">Austin training spots</h2>
+        </div>
+      </div>
+      <div id="notes-filters" class="notes-filters" aria-label="Notes category filters"></div>
+      <div id="notes-list" class="notes-list"></div>
+    </aside>
 
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 

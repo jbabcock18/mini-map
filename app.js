@@ -10,16 +10,36 @@ const config = {
 };
 
 const categoryNav = document.getElementById("category-nav");
+const notesToggleButton = document.getElementById("notes-toggle");
+const notesPanel = document.getElementById("notes-panel");
+const notesFilters = document.getElementById("notes-filters");
+const notesList = document.getElementById("notes-list");
 const toast = document.getElementById("toast");
+const FITNESS_CATEGORIES = new Set(Object.keys(CATEGORY_META));
+const ROOT_MENU_ITEMS = [
+  { key: "all", label: "all" },
+  { key: "coffee", label: "coffee" },
+  { key: "fitness", label: "fitness" },
+];
+const NOTES_FILTER_ITEMS = [
+  { key: "all", label: "all" },
+  { key: "calisthenics", label: "calisthenics" },
+  { key: "trail", label: "trails" },
+  { key: "track", label: "tracks" },
+  { key: "hill", label: "hills" },
+];
 
 const state = {
-  activeCategory: "all",
+  activeDomain: "all",
+  notesOpen: false,
+  notesCategory: "all",
 };
 
 let toastTimeoutId = null;
 const CALISTHENICS_ICON_ID = "calisthenics-emblem";
-const CALISTHENICS_ICON_PATH =
-  "./assets/circle-greek-frame-round-meander-border-decoration-elements-pattern-png.png";
+const CALISTHENICS_ICON_PATH = "./assets/marker_lightblue-removebg-preview.png";
+const HILL_ICON_ID = "hill-emblem";
+const HILL_ICON_PATH = "./assets/marker_yellow-removebg-preview.png";
 
 function showToast(message) {
   if (!message || !toast) return;
@@ -80,25 +100,32 @@ function categoryColorExpression() {
   ];
 }
 
-function ensureMapImages() {
-  if (map.hasImage(CALISTHENICS_ICON_ID)) {
+function ensureMapImage(imageId, imagePath, label) {
+  if (map.hasImage(imageId)) {
     return Promise.resolve();
   }
 
   return new Promise((resolve) => {
-    map.loadImage(CALISTHENICS_ICON_PATH, (error, image) => {
+    map.loadImage(imagePath, (error, image) => {
       if (error || !image) {
-        console.error(error || new Error("Failed to load calisthenics icon"));
+        console.error(error || new Error(`Failed to load ${label} icon`));
         resolve();
         return;
       }
 
-      if (!map.hasImage(CALISTHENICS_ICON_ID)) {
-        map.addImage(CALISTHENICS_ICON_ID, image);
+      if (!map.hasImage(imageId)) {
+        map.addImage(imageId, image);
       }
       resolve();
     });
   });
+}
+
+function ensureMapImages() {
+  return Promise.all([
+    ensureMapImage(CALISTHENICS_ICON_ID, CALISTHENICS_ICON_PATH, "calisthenics"),
+    ensureMapImage(HILL_ICON_ID, HILL_ICON_PATH, "hill"),
+  ]);
 }
 
 function allAreaFeatures() {
@@ -109,16 +136,172 @@ function allSegmentFeatures() {
   return Array.isArray(WORKOUT_SEGMENTS_GEOJSON.features) ? WORKOUT_SEGMENTS_GEOJSON.features : [];
 }
 
+function inferFeatureDomain(feature) {
+  const explicitDomain = feature?.properties?.domain;
+  if (explicitDomain) return explicitDomain;
+
+  const category = feature?.properties?.category;
+  if (FITNESS_CATEGORIES.has(category)) return "fitness";
+  if (category === "coffee" || category === "cafe") return "coffee";
+  return "all";
+}
+
 function filteredAreaFeatures() {
   const features = allAreaFeatures();
-  if (state.activeCategory === "all") return features;
-  return features.filter((feature) => feature?.properties?.category === state.activeCategory);
+  if (state.activeDomain === "all") return features;
+  if (state.activeDomain === "coffee") {
+    return features.filter((feature) => inferFeatureDomain(feature) === "coffee");
+  }
+  return features.filter((feature) => inferFeatureDomain(feature) === "fitness");
 }
 
 function filteredSegmentFeatures() {
-  const features = allSegmentFeatures();
-  if (state.activeCategory === "all") return features;
-  return features.filter((feature) => feature?.properties?.category === state.activeCategory);
+  const features = allSegmentFeatures().filter((feature) => feature?.properties?.hidden !== true);
+  if (state.activeDomain === "all") return features;
+  if (state.activeDomain === "coffee") {
+    return features.filter((feature) => inferFeatureDomain(feature) === "coffee");
+  }
+  return features.filter((feature) => inferFeatureDomain(feature) === "fitness");
+}
+
+function buildRailButton({ label, key, kind }) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.dataset.key = key;
+
+  button.className = "rail-link";
+  button.dataset.action = "select";
+
+  const isActive = state.activeDomain === key;
+  if (isActive) {
+    button.classList.add("is-active");
+  }
+  return button;
+}
+
+function renderNav() {
+  if (!categoryNav) return;
+  categoryNav.innerHTML = "";
+
+  ROOT_MENU_ITEMS.forEach((item) => {
+    categoryNav.appendChild(buildRailButton({ ...item, kind: "item" }));
+  });
+}
+
+function getNotesFeatures() {
+  const features = [...allAreaFeatures(), ...allSegmentFeatures().filter((feature) => feature?.properties?.hidden !== true)].filter(
+    (feature) => inferFeatureDomain(feature) === "fitness",
+  );
+
+  if (state.notesCategory === "all") {
+    return features;
+  }
+
+  return features.filter((feature) => feature?.properties?.category === state.notesCategory);
+}
+
+function renderNotesFilters() {
+  if (!notesFilters) return;
+  notesFilters.innerHTML = "";
+
+  NOTES_FILTER_ITEMS.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "notes-filter";
+    if (state.notesCategory === item.key) {
+      button.classList.add("is-active");
+    }
+    button.dataset.key = item.key;
+    button.textContent = item.label;
+    notesFilters.appendChild(button);
+  });
+}
+
+function focusFeature(feature) {
+  if (!feature) return;
+
+  if (feature.geometry?.type === "Point") {
+    focusArea(feature, true);
+    return;
+  }
+
+  if (feature.geometry?.type === "LineString") {
+    const coordinates = feature.geometry.coordinates || [];
+    if (!coordinates.length) return;
+
+    const bounds = new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]);
+    coordinates.forEach((coord) => bounds.extend(coord));
+    map.fitBounds(bounds, {
+      padding: { top: 120, right: 120, bottom: 120, left: 120 },
+      duration: 760,
+    });
+
+    const midpoint = coordinates[Math.floor(coordinates.length / 2)];
+    new mapboxgl.Popup({ offset: 10 })
+      .setLngLat(midpoint)
+      .setHTML(segmentPopupHtml(feature.properties || {}))
+      .addTo(map);
+  }
+}
+
+function renderNotesList() {
+  if (!notesList) return;
+  notesList.innerHTML = "";
+
+  const features = getNotesFeatures().sort((a, b) =>
+    (a.properties?.name || "").localeCompare(b.properties?.name || ""),
+  );
+
+  if (!features.length) {
+    const empty = document.createElement("div");
+    empty.className = "notes-empty";
+    empty.textContent = "No mapped spots in this category yet.";
+    notesList.appendChild(empty);
+    return;
+  }
+
+  features.forEach((feature, index) => {
+    const props = feature.properties || {};
+    const category = props.category || "fitness";
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "notes-item";
+    item.dataset.index = String(index);
+
+    const categoryLabel = CATEGORY_META[category]?.label || category;
+
+    item.innerHTML = `
+      <div class="notes-item-head">
+        <p class="notes-item-title">${props.name || "Untitled spot"}</p>
+        <span class="notes-item-leader" aria-hidden="true"></span>
+        <p class="notes-item-meta is-${category}">
+          <span class="notes-item-meta-dot" aria-hidden="true"></span>
+          <span>${categoryLabel}</span>
+        </p>
+      </div>
+    `;
+
+    item.addEventListener("click", () => {
+      focusFeature(features[index]);
+    });
+
+    notesList.appendChild(item);
+  });
+}
+
+function syncNotesPanel() {
+  if (!notesPanel || !notesToggleButton) return;
+
+  notesPanel.classList.toggle("hidden", !state.notesOpen);
+  notesToggleButton.classList.toggle("is-active", state.notesOpen);
+  notesToggleButton.setAttribute("aria-expanded", String(state.notesOpen));
+  notesToggleButton.textContent = state.notesOpen ? "close notes" : "notes";
+
+  if (state.notesOpen) {
+    renderNotesFilters();
+    renderNotesList();
+  }
 }
 
 if (!config.accessToken) {
@@ -163,6 +346,10 @@ function setupMapSourcesAndLayers() {
       id: "workout-segment-casing",
       type: "line",
       source: "workout-segments",
+      layout: {
+        "line-cap": "round",
+        "line-join": "round",
+      },
       paint: {
         "line-color": "rgba(255,255,255,0.92)",
         "line-width": ["interpolate", ["linear"], ["zoom"], 10, 6, 15, 10.5],
@@ -176,6 +363,10 @@ function setupMapSourcesAndLayers() {
       id: "workout-segment-line",
       type: "line",
       source: "workout-segments",
+      layout: {
+        "line-cap": "round",
+        "line-join": "round",
+      },
       paint: {
         "line-color": [
           "match",
@@ -221,11 +412,37 @@ function setupMapSourcesAndLayers() {
           CALISTHENICS_ICON_ID,
           "marker-15",
         ],
-        "icon-size": ["interpolate", ["linear"], ["zoom"], 10, 0.09, 15, 0.13],
+        "icon-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10,
+          ["match", ["get", "category"], "calisthenics", 0.042, 0.8],
+          15,
+          ["match", ["get", "category"], "calisthenics", 0.078, 1],
+        ],
         "icon-allow-overlap": true,
       },
       paint: {
         "icon-opacity": 0.96,
+      },
+    });
+  }
+
+  if (!map.getLayer("workout-segment-marker")) {
+    map.addLayer({
+      id: "workout-segment-marker",
+      type: "symbol",
+      source: "workout-segments",
+      filter: ["==", ["get", "category"], "hill"],
+      layout: {
+        "symbol-placement": "line-center",
+        "icon-image": HILL_ICON_ID,
+        "icon-size": ["interpolate", ["linear"], ["zoom"], 10, 0.045, 15, 0.08],
+        "icon-allow-overlap": true,
+      },
+      paint: {
+        "icon-opacity": 0.97,
       },
     });
   }
@@ -267,7 +484,7 @@ function setupMapSourcesAndLayers() {
         "text-ignore-placement": false,
       },
       paint: {
-        "text-color": "rgba(120, 77, 70, 0.94)",
+        "text-color": "#ECAA24",
         "text-halo-color": "rgba(247, 245, 240, 0.98)",
         "text-halo-width": 1.4,
         "text-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0, 12, 1],
@@ -341,23 +558,38 @@ function fitToCurrentData() {
   });
 }
 
-function applyCategorySelection(category) {
-  state.activeCategory = category;
-
-  categoryNav.querySelectorAll(".rail-link").forEach((button) => {
-    if (!(button instanceof HTMLButtonElement)) return;
-    button.classList.toggle("is-active", button.dataset.category === state.activeCategory);
-  });
-
+function applyDomainSelection(domain) {
+  state.activeDomain = domain;
+  renderNav();
   refreshMapSources();
+
+  if (domain === "coffee" && !filteredAreaFeatures().length && !filteredSegmentFeatures().length) {
+    showToast("No coffee spots loaded yet.");
+  }
 }
 
 function wireUiEvents() {
-  categoryNav.querySelectorAll(".rail-link").forEach((button) => {
-    if (!(button instanceof HTMLButtonElement)) return;
-    button.addEventListener("click", () => {
-      applyCategorySelection(button.dataset.category || "all");
-    });
+  if (!categoryNav) return;
+
+  categoryNav.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement)) return;
+
+    const key = target.dataset.key || "all";
+    applyDomainSelection(key);
+  });
+
+  notesToggleButton?.addEventListener("click", () => {
+    state.notesOpen = !state.notesOpen;
+    syncNotesPanel();
+  });
+
+  notesFilters?.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement)) return;
+    state.notesCategory = target.dataset.key || "all";
+    renderNotesFilters();
+    renderNotesList();
   });
 }
 
@@ -422,9 +654,11 @@ function wireMapEvents() {
 map.on("load", async () => {
   await ensureMapImages();
   setupMapSourcesAndLayers();
+  renderNav();
+  syncNotesPanel();
   wireUiEvents();
   wireMapEvents();
-  applyCategorySelection("all");
+  refreshMapSources();
 
   if (!allAreaFeatures().length && !allSegmentFeatures().length) {
     showToast("No workout data loaded yet.");
