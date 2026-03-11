@@ -98,6 +98,19 @@ export const WORKOUT_AREAS_GEOJSON = {
         coordinates: [-97.759490585439, 30.314438258284966],
       },
     },
+    {
+      type: "Feature",
+      properties: {
+        id: "the-secret-spot",
+        name: "The Secret Spot",
+        category: "calisthenics",
+        neighborhood: "South Austin",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-97.74619707712434, 30.242162193046703],
+      },
+    },
   ],
 };
 
