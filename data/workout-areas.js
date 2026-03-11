@@ -111,6 +111,32 @@ export const WORKOUT_AREAS_GEOJSON = {
         coordinates: [-97.74619707712434, 30.242162193046703],
       },
     },
+    {
+      type: "Feature",
+      properties: {
+        id: "brownie-neighborhood-park",
+        name: "Brownie Neighborhood Park",
+        category: "calisthenics",
+        neighborhood: "North Austin",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-97.68686610874462, 30.36404339461126],
+      },
+    },
+    {
+      type: "Feature",
+      properties: {
+        id: "little-walnut-creek",
+        name: "Little Walnut Creek",
+        category: "calisthenics",
+        neighborhood: "East Austin",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-97.67476995500506, 30.29749106869121],
+      },
+    },
   ],
 };
 
