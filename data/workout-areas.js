@@ -137,6 +137,19 @@ export const WORKOUT_AREAS_GEOJSON = {
         coordinates: [-97.67476995500506, 30.29749106869121],
       },
     },
+    {
+      type: "Feature",
+      properties: {
+        id: "mueller-lake-bars",
+        name: "Mueller Lake Bars",
+        category: "calisthenics",
+        neighborhood: "Mueller",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-97.70411744988156, 30.296616019691655],
+      },
+    },
   ],
 };
 
